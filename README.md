@@ -5,6 +5,8 @@ An interactive 3D WebGL particle sphere featuring real-time AI hand and gesture 
 ![Particle Sphere Preview](https://img.shields.io/badge/WebGL-Interactive-blueviolet?style=for-the-badge)
 ![MediaPipe Hands](https://img.shields.io/badge/MediaPipe-Hands_Tracking-brightgreen?style=for-the-badge)
 ![Vanilla JS](https://img.shields.io/badge/Vanilla-JS_%26_CSS-orange?style=for-the-badge)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-22c55e?style=for-the-badge&logo=github)](https://sudeep06250.github.io/particle-sphere/)
+
 
 ---
 
