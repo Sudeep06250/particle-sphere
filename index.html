@@ -3,60 +3,57 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Particle Sphere · Hand & Gesture Controlled</title>
+<title>Particle Sphere · Hand Controlled</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&display=swap');
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#060608;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.09);
-  --muted:rgba(255,255,255,.38);--accent:#a78bfa;--accent2:#38bdf8;
+  --bg:#060608;--surface:rgba(255,255,255,.04);--border:rgba(255,255,255,.09);
+  --muted:rgba(255,255,255,.35);--accent:#a78bfa;--accent2:#38bdf8;
 }
 html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
   font-family:'Inter',sans-serif;overflow:hidden;user-select:none}
 
 #webcam{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0.85;transition:opacity .5s;pointer-events:none;transform:scaleX(-1);z-index:0}
-#webcam.dimmed{opacity:0.10}
-#webcam.hidden{opacity:0}
-
-#glCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:1;cursor:grab}
-#glCanvas:active{cursor:grabbing}
+  opacity:1;transition:opacity .5s;pointer-events:none;transform:scaleX(-1);z-index:0}
+#webcam.dimmed{opacity:0.12}
+#glCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:1}
 #hkCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 #ui{position:fixed;inset:0;z-index:10;pointer-events:none}
 
 .brand{position:absolute;top:30px;left:34px;pointer-events:auto;cursor:pointer}
-.brand h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;
-  letter-spacing:.05em;color:rgba(255,255,255,.94);line-height:1.1}
+.brand h1{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:300;
+  letter-spacing:.05em;color:rgba(255,255,255,.92);line-height:1.1}
 .brand p{font-size:10px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--muted);margin-top:5px}
 
 #status{position:absolute;top:30px;right:34px;display:flex;align-items:center;
   gap:8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.dot{width:8px;height:8px;border-radius:50%;background:#ef4444;transition:background .4s;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;background:#ef4444;transition:background .4s;flex-shrink:0}
 #status.ok .dot{background:#22c55e}
 #status.live .dot{background:var(--accent);animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.6)}}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.7)}}
 
 #guide{position:absolute;top:30px;left:50%;transform:translateX(-50%);
-  display:flex;gap:22px;opacity:0;transition:opacity .6s ease;pointer-events:auto}
+  display:flex;gap:22px;opacity:0;transition:opacity .7s;pointer-events:none}
 #guide.on{opacity:1}
-.gi{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default}
+.gi{display:flex;flex-direction:column;align-items:center;gap:3px}
 .gi-icon{font-size:17px;line-height:1}
 .gi-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
 
 #hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
   text-align:center;white-space:nowrap;pointer-events:none}
-.hn{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;
-  font-style:italic;color:rgba(255,255,255,.78);margin-bottom:4px}
+.hn{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;
+  font-style:italic;color:rgba(255,255,255,.72);margin-bottom:4px}
 .hd{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
 
 #cring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  pointer-events:none;opacity:0;transition:opacity .25s ease}
+  pointer-events:none;opacity:0;transition:opacity .3s}
 #cring.on{opacity:1}
 #cring svg{overflow:visible}
 #carc{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;
-  filter:drop-shadow(0 0 10px var(--accent))}
+  filter:drop-shadow(0 0 9px var(--accent))}
 
 #fpips{position:absolute;top:50%;right:34px;transform:translateY(-50%);
   display:flex;flex-direction:column;align-items:center;gap:6px;
@@ -64,11 +61,10 @@ html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
 #fpips.on{opacity:1}
 .fl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin-bottom:4px}
-.pip{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.14);
+.pip{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.13);
   display:flex;align-items:center;justify-content:center;font-size:11px;
-  color:var(--muted);transition:all .25s;cursor:pointer;background:rgba(0,0,0,.25)}
-.pip:hover{border-color:rgba(255,255,255,.5);color:#fff;transform:scale(1.08)}
-.pip.on{border-color:var(--accent);background:rgba(167,139,250,.2);
+  color:var(--muted);transition:all .3s;cursor:pointer}
+.pip.on{border-color:var(--accent);background:rgba(167,139,250,.16);
   color:var(--accent);box-shadow:0 0 14px rgba(167,139,250,.45)}
 
 #smeter{position:absolute;bottom:34px;right:34px;width:140px;
@@ -76,34 +72,34 @@ html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
 #smeter.on{opacity:1}
 .sml{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin-bottom:8px}
-.smtr{height:2px;background:rgba(255,255,255,.08);border-radius:2px;position:relative}
+.smtr{height:2px;background:rgba(255,255,255,.07);border-radius:2px;position:relative}
 .smfi{height:100%;border-radius:2px;
   background:linear-gradient(90deg,var(--accent2),var(--accent));
   box-shadow:0 0 8px var(--accent2)}
 .smth{width:8px;height:8px;border-radius:50%;background:#fff;position:absolute;
-  top:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px rgba(255,255,255,.6)}
+  top:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px rgba(255,255,255,.55)}
 
-#camBtn{position:absolute;bottom:34px;left:34px;pointer-events:auto;
+#camBtn{position:absolute;bottom:34px;left:34px;pointer-events:all;
   background:var(--surface);border:1px solid var(--border);color:var(--muted);
   font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.15em;
   text-transform:uppercase;padding:10px 18px;border-radius:40px;cursor:pointer;
   display:flex;align-items:center;gap:8px;transition:all .3s;backdrop-filter:blur(12px)}
-#camBtn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.9)}
-#camBtn.on{border-color:var(--accent2);color:var(--accent2);box-shadow:0 0 16px rgba(56,189,248,.25)}
+#camBtn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.8)}
+#camBtn.on{border-color:var(--accent2);color:var(--accent2);box-shadow:0 0 16px rgba(56,189,248,.2)}
 
 #flash{position:fixed;inset:0;
-  background:radial-gradient(ellipse at center,rgba(167,139,250,.5) 0%,transparent 70%);
+  background:radial-gradient(ellipse at center,rgba(167,139,250,.45) 0%,transparent 70%);
   z-index:5;opacity:0;pointer-events:none}
 #flash.bang{opacity:1;transition:none}
 #flash.fade{opacity:0;transition:opacity 1.6s ease}
 
 #loading{position:fixed;inset:0;background:var(--bg);z-index:100;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:22px;transition:opacity .8s,visibility .8s}
+  gap:22px;transition:opacity .9s,visibility .9s}
 #loading.gone{opacity:0;visibility:hidden}
-.ltitle{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;
-  letter-spacing:.07em;color:rgba(255,255,255,.85)}
-.lbar{width:200px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.ltitle{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;
+  letter-spacing:.07em;color:rgba(255,255,255,.82)}
+.lbar{width:200px;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden}
 .lfill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));
   width:0;transition:width .4s ease;box-shadow:0 0 8px var(--accent)}
 .ltxt{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
@@ -117,22 +113,22 @@ html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
 <div id="flash"></div>
 
 <div id="ui">
-  <div class="brand" id="brandBtn" title="Click to toggle guide">
+  <div class="brand" id="brandBtn">
     <h1>Particle Sphere</h1>
-    <p>Hand &middot; Gesture &middot; Mouse Controlled</p>
+    <p>Hand Controlled &middot; 3000 Particles</p>
   </div>
   <div id="status"><div class="dot"></div><span id="stxt">Initializing</span></div>
 
   <div id="guide">
     <div class="gi"><div class="gi-icon">☝️</div><div class="gi-lbl">Move</div></div>
     <div class="gi"><div class="gi-icon">🤏</div><div class="gi-lbl">Charge</div></div>
-    <div class="gi"><div class="gi-icon">🤚</div><div class="gi-lbl">Color (0-5)</div></div>
+    <div class="gi"><div class="gi-icon">🤚</div><div class="gi-lbl">Color</div></div>
     <div class="gi"><div class="gi-icon">🙌</div><div class="gi-lbl">Scale</div></div>
   </div>
 
   <div id="hint">
     <div class="hn" id="hname">—</div>
-    <div class="hd" id="hdesc">Show hand or drag with mouse to begin</div>
+    <div class="hd" id="hdesc">Show your hand to begin</div>
   </div>
 
   <div id="cring">
@@ -144,13 +140,13 @@ html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
     </svg>
   </div>
 
-  <div id="fpips"><div class="fl">Palettes</div></div>
+  <div id="fpips"><div class="fl">Fingers</div></div>
 
   <div id="smeter">
     <div class="sml">Scale</div>
     <div class="smtr">
-      <div class="smfi" id="smfi" style="width:38.8%"></div>
-      <div class="smth" id="smth" style="left:38.8%"></div>
+      <div class="smfi" id="smfi" style="width:50%"></div>
+      <div class="smth" id="smth" style="left:50%"></div>
     </div>
   </div>
 
@@ -158,14 +154,14 @@ html,body{width:100%;height:100%;background:var(--bg);color:#ddd;
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
     </svg>
-    <span>Webcam Active</span>
+    <span>Webcam On</span>
   </button>
 </div>
 
 <div id="loading">
   <div class="ltitle">Particle Sphere</div>
   <div class="lbar"><div class="lfill" id="lfill"></div></div>
-  <div class="ltxt" id="ltxt">Initializing particles…</div>
+  <div class="ltxt" id="ltxt">Loading…</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -185,9 +181,9 @@ const MIN_R      = 60;
 const MAX_R      = 420;
 const CAM_Z      = 700;   // camera distance
 const FOV        = Math.PI / 4;
-const CHARGE_MS  = 1400;
+const CHARGE_MS  = 1500;
 const EXPLODE_MS = 900;
-const REFORM_MS  = 3000;
+const REFORM_MS  = 3200;
 
 /* ═══════════════════════════════════════
    DOM REFS
@@ -209,7 +205,7 @@ const smth     = document.getElementById('smth');
 const guide    = document.getElementById('guide');
 const loadEl   = document.getElementById('loading');
 const lfill    = document.getElementById('lfill');
-const camBtn   = document.getElementById('camBtn');
+const ltxt     = document.getElementById('ltxt');
 const brandBtn = document.getElementById('brandBtn');
 const hCtx     = hkCanvas.getContext('2d');
 
@@ -219,7 +215,7 @@ const hCtx     = hkCanvas.getContext('2d');
 const gl = glCanvas.getContext('webgl', { alpha: true, premultipliedAlpha: false })
           || glCanvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
 if (!gl) {
-  alert('WebGL is not supported in this browser. Please use Chrome, Edge, or Firefox.');
+  alert('WebGL is not supported in this browser. Please use Chrome or Firefox.');
   return;
 }
 
@@ -235,35 +231,32 @@ let autoAY = 0;
 
 let exploding = false, reforming = false;
 let explodeStart = 0,  reformStart = 0;
-let chargeLevel = 0,   pinching = false, pinchStart = 0;
 
-// 6 curated color schemes (mapped to finger count 0-5)
+let chargeLevel = 0, pinching = false, pinchStart = 0;
+
+// 6 colour presets – one per finger count 0-5
 const FCOLS = [
-  [0.55, 0.32, 1.00],   // 0 – Cosmic Violet
-  [0.18, 0.74, 0.98],   // 1 – Electric Cyan
-  [0.28, 0.98, 0.60],   // 2 – Neon Mint
-  [1.00, 0.78, 0.22],   // 3 – Radiant Amber
-  [1.00, 0.40, 0.42],   // 4 – Solar Coral
-  [0.95, 0.48, 1.00],   // 5 – Astral Orchid
+  [0.55, 0.32, 1.00],   // 0 – deep violet
+  [0.18, 0.74, 0.98],   // 1 – sky blue
+  [0.28, 0.98, 0.60],   // 2 – mint green
+  [1.00, 0.78, 0.22],   // 3 – amber
+  [1.00, 0.40, 0.42],   // 4 – coral
+  [0.95, 0.48, 1.00],   // 5 – orchid
 ];
 let curCol = [...FCOLS[0]];
 let tgtCol = [...FCOLS[0]];
-let curPalIdx = 0;
 
 let handOn   = false, twoHands = false;
 let prevDist = null,  lastFC   = -1;
 let webcamBG = true;
 let appTime  = 0,     lastT    = 0;
-let lastInteractionTime = performance.now();
-let lastIdleExplode = 0;
-let cameraActive = false;
 
 /* ═══════════════════════════════════════
    RESIZE
 ═══════════════════════════════════════ */
 function resize(){
-  glCanvas.width  = hkCanvas.width  = window.innerWidth;
-  glCanvas.height = hkCanvas.height = window.innerHeight;
+  glCanvas.width = hkCanvas.width  = window.innerWidth;
+  glCanvas.height= hkCanvas.height = window.innerHeight;
   if(gl) gl.viewport(0, 0, glCanvas.width, glCanvas.height);
 }
 window.addEventListener('resize', resize);
@@ -282,33 +275,33 @@ uniform mat4  uMVP;
 uniform float uExplT;  // [0,1] explosion progress
 uniform float uRefT;   // [0,1] reform progress
 uniform float uTime;
-uniform float uRad;    // current sphere radius
+uniform float uRad;    // current sphere radius (world units)
 
 varying float vAlpha;
 varying float vPhase;
 
 void main(){
   vec3 sp = aOrig * (uRad / ${BASE_R.toFixed(1)});
-  vec3 ex = aExpl * 2400.0;
+  vec3 ex = aExpl * 2500.0;
   vec3 pos;
 
   if(uExplT > 0.0){
-    // Cubic ease-out outward burst
+    // Cubic ease-out explosion
     float e = 1.0 - pow(1.0 - uExplT, 3.0);
     pos     = mix(sp, ex, e);
     vAlpha  = 1.0 - uExplT * 0.85;
 
   } else if(uRefT > 0.0){
-    // Staggered reform from cloud back to sphere
-    float delay = aPhase * 0.42;
-    float denom = max(1.0 - delay * 0.58, 0.01);
+    // Staggered reform smoothly converging from exploded positions
+    float delay = aPhase * 0.45;
+    float denom = max(1.0 - delay * 0.55, 0.01);
     float tl    = clamp((uRefT - delay) / denom, 0.0, 1.0);
     float e     = 1.0 - pow(1.0 - tl, 3.0);
     pos         = mix(ex, sp, e);
     vAlpha      = tl;
 
   } else {
-    // Breathing motion
+    // Idle breathing
     float breathe = sin(uTime * 0.9 + aPhase * 6.2832) * 3.5;
     pos    = sp + normalize(sp) * breathe;
     vAlpha = 0.85 + sin(uTime * 1.3 + aPhase * 6.2832) * 0.12;
@@ -316,9 +309,9 @@ void main(){
 
   gl_Position = uMVP * vec4(pos, 1.0);
 
-  float sz    = aSize * (1.0 + sin(uTime * 0.6 + aPhase * 6.2832) * 0.15);
+  float sz    = aSize * (1.0 + sin(uTime * 0.6 + aPhase * 6.2832) * 0.14);
   float depth = max(gl_Position.w, 0.1);
-  gl_PointSize = clamp(sz * (420.0 / depth), 2.5, 22.0);
+  gl_PointSize = clamp(sz * (420.0 / depth), 3.0, 22.0);
 
   vPhase = aPhase;
 }`;
@@ -334,7 +327,7 @@ void main(){
   vec2  c    = gl_PointCoord - 0.5;
   float d    = length(c);
   if(d > 0.5) discard;
-  float soft = 1.0 - smoothstep(0.28, 0.5, d);
+  float soft = 1.0 - smoothstep(0.30, 0.5, d);
   vec3  col  = mix(uCol, uCol2, vPhase);
   gl_FragColor = vec4(col, soft * vAlpha);
 }`;
@@ -343,9 +336,8 @@ function mkShader(type, src){
   const s = gl.createShader(type);
   gl.shaderSource(s, src);
   gl.compileShader(s);
-  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS))
     console.error('Shader error:', gl.getShaderInfoLog(s));
-  }
   return s;
 }
 
@@ -353,9 +345,8 @@ const prog = gl.createProgram();
 gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   VS));
 gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FS));
 gl.linkProgram(prog);
-if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS))
   console.error('Program link error:', gl.getProgramInfoLog(prog));
-}
 gl.useProgram(prog);
 
 const AL = {
@@ -472,7 +463,7 @@ function mPersp(fovY, asp, near, far){
 }
 
 /* ═══════════════════════════════════════
-   UI HELPERS & PALETTE PIPS
+   UI HELPERS
 ═══════════════════════════════════════ */
 function setSt(cls, txt){ statusEl.className = cls; stxt.textContent = txt; }
 function setG(n, d){ hname.textContent = n; hdesc.textContent = d; }
@@ -482,29 +473,27 @@ for(let i = 0; i <= 5; i++){
   const el = document.createElement('div');
   el.className = 'pip';
   el.textContent = i;
-  el.title = `Switch to Palette ${i}`;
+  el.title = `Color palette ${i}`;
   el.addEventListener('click', (e) => {
     e.stopPropagation();
-    lastInteractionTime = performance.now();
     updateFC(i);
-    const names = ['Cosmic Violet','Electric Cyan','Neon Mint','Radiant Amber','Solar Coral','Astral Orchid'];
-    setG(names[i], `Active color theme`);
   });
   fpips.appendChild(el);
   pips.push(el);
 }
-fpips.classList.add('on');
 
 function updateFC(fc){
-  curPalIdx = Math.min(Math.max(0, fc), 5);
-  pips.forEach((p, i) => p.classList.toggle('on', i === curPalIdx));
-  tgtCol = [...FCOLS[curPalIdx]];
+  const idx = Math.min(Math.max(0, fc), 5);
+  pips.forEach((p, i) => p.classList.toggle('on', i === idx));
+  tgtCol = [...FCOLS[idx]];
 }
 updateFC(0);
 
-brandBtn.addEventListener('click', () => {
-  guide.classList.toggle('on');
-});
+if (brandBtn) {
+  brandBtn.addEventListener('click', () => {
+    guide.classList.toggle('on');
+  });
+}
 
 /* ═══════════════════════════════════════
    EXPLOSION
@@ -515,7 +504,7 @@ function triggerExplode(){
   explodeStart = performance.now();
   flash.className = 'bang';
   setTimeout(() => flash.className = 'fade', 50);
-  setTimeout(() => flash.className = '', 1800);
+  setTimeout(() => flash.className = '',    1800);
 }
 
 /* ═══════════════════════════════════════
@@ -535,7 +524,8 @@ function drawSkel(lm){
   function px(p){ return (1 - p.x) * W; }
   function py(p){ return p.y * H; }
 
-  hCtx.strokeStyle = 'rgba(167,139,250,.35)';
+  // Connections
+  hCtx.strokeStyle = 'rgba(167,139,250,.30)';
   hCtx.lineWidth   = 1.5;
   CONN.forEach(([a,b]) => {
     hCtx.beginPath();
@@ -544,6 +534,7 @@ function drawSkel(lm){
     hCtx.stroke();
   });
 
+  // Joints
   lm.forEach((p, i) => {
     const x = px(p), y = py(p);
     const isTip   = (i===4||i===8||i===12||i===16||i===20);
@@ -557,7 +548,7 @@ function drawSkel(lm){
 
     if(isTip){
       const g = hCtx.createRadialGradient(x, y, 0, x, y, 18);
-      g.addColorStop(0, 'rgba(167,139,250,.24)');
+      g.addColorStop(0, 'rgba(167,139,250,.22)');
       g.addColorStop(1, 'transparent');
       hCtx.beginPath();
       hCtx.arc(x, y, 18, 0, Math.PI * 2);
@@ -568,26 +559,23 @@ function drawSkel(lm){
 }
 
 /* ═══════════════════════════════════════
-   ACCURATE GESTURE HELPERS
+   GESTURE HELPERS
 ═══════════════════════════════════════ */
 function ldist(a, b){ return Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z); }
 
-function countFingers(lm){
+function countFingers(lm, handedness){
   let c = 0;
-  // Robust thumb detection: distance from tip (4) to pinky base (17) vs IP (3) to pinky base (17)
-  const thumbTipDist = Math.hypot(lm[4].x - lm[17].x, lm[4].y - lm[17].y);
-  const thumbIpDist  = Math.hypot(lm[3].x - lm[17].x, lm[3].y - lm[17].y);
-  if (thumbTipDist > thumbIpDist * 1.1) c++;
+  // Thumb detection:
+  // In mirrored view (webcam scaleX(-1)), right hand thumb extends leftward (lm[4].x < lm[3].x).
+  // Left hand thumb extends rightward (lm[4].x > lm[3].x).
+  const isLeft = handedness && handedness.label === 'Left';
+  if (isLeft ? (lm[4].x > lm[3].x) : (lm[4].x < lm[3].x)) c++;
 
-  // 4 fingers: compare distance from fingertip to wrist (0) vs PIP knuckle to wrist (0)
-  const wrist = lm[0];
-  const tips = [8, 12, 16, 20];
-  const pips = [6, 10, 14, 18];
-  for(let i = 0; i < 4; i++){
-    const tipDist = Math.hypot(lm[tips[i]].x - wrist.x, lm[tips[i]].y - wrist.y);
-    const pipDist = Math.hypot(lm[pips[i]].x - wrist.x, lm[pips[i]].y - wrist.y);
-    if(tipDist > pipDist * 1.12) c++;
-  }
+  // 4 fingers: tip y is above pip knuckle y (smaller value in screen coords)
+  if(lm[8].y  < lm[6].y)  c++;
+  if(lm[12].y < lm[10].y) c++;
+  if(lm[16].y < lm[14].y) c++;
+  if(lm[20].y < lm[18].y) c++;
   return c;
 }
 
@@ -602,7 +590,7 @@ const HALF_TAN = Math.tan(FOV / 2);
 function handToWorld(ctr, asp){
   const depth = CAM_Z;
   const wx = (0.5 - ctr.x) * 1.6 * depth * asp * HALF_TAN;
-  const wy = (0.5 - ctr.y) * 1.6 * depth * HALF_TAN;
+  const wy = (0.5 - ctr.y) * 1.6 * depth       * HALF_TAN;
   return { wx, wy };
 }
 
@@ -616,16 +604,16 @@ function onResults(res){
     if(handOn){
       handOn = false; twoHands = false; prevDist = null;
       if(pinching){ pinching = false; cring.classList.remove('on'); chargeLevel = 0; }
-      setSt('ok', 'Mouse / Idle Mode');
-      setG('—', 'Show hand or drag with mouse');
+      setSt('ok', 'No hands');
+      setG('—', 'Show your hand to begin');
+      fpips.classList.remove('on');
       smeter.classList.remove('on');
     }
     return;
   }
 
   handOn = true;
-  lastInteractionTime = performance.now();
-  setSt('live', 'Hand Tracking');
+  setSt('live', 'Tracking');
 
   const hands = res.multiHandLandmarks;
   hands.forEach(lm => drawSkel(lm));
@@ -633,8 +621,9 @@ function onResults(res){
   const asp = glCanvas.width / glCanvas.height;
 
   if(twoHands){
-    /* ── TWO HANDS: Scale Sphere ── */
+    /* ── TWO HANDS: scale ── */
     if(pinching){ pinching = false; cring.classList.remove('on'); chargeLevel = 0; }
+    fpips.classList.remove('on');
     smeter.classList.add('on');
 
     const c1 = handCenter(hands[0]), c2 = handCenter(hands[1]);
@@ -649,28 +638,29 @@ function onResults(res){
     smfi.style.width = (pct * 100).toFixed(1) + '%';
     smth.style.left  = (pct * 100).toFixed(1) + '%';
 
+    // Move sphere to midpoint
     const mx = (c1.x + c2.x) / 2, my = (c1.y + c2.y) / 2;
     const { wx, wy } = handToWorld({ x: mx, y: my }, asp);
     tgtWX = wx; tgtWY = wy;
 
-    setG('Two Hands', 'Spread or pinch hands to resize sphere');
+    setG('Two Hands', 'Spread / pinch to resize');
 
   } else {
-    /* ── ONE HAND: Move, Rotate, Pinch Charge ── */
+    /* ── ONE HAND: move, rotate, pinch ── */
     prevDist = null;
     smeter.classList.remove('on');
+    fpips.classList.add('on');
 
     const lm  = hands[0];
-    const fc  = countFingers(lm);
-    if(fc !== lastFC){
-      lastFC = fc;
-      updateFC(fc);
-    }
+    const handedness = (res.multiHandedness && res.multiHandedness[0]) ? res.multiHandedness[0] : null;
+    const fc  = countFingers(lm, handedness);
+    if(fc !== lastFC){ lastFC = fc; updateFC(fc); }
 
     const ctr = handCenter(lm);
     const { wx, wy } = handToWorld(ctr, asp);
     tgtWX = wx; tgtWY = wy;
 
+    // Rotation driven by hand position
     tgtAY = (ctr.x - 0.5) *  Math.PI * 0.7;
     tgtAX = (ctr.y - 0.5) * -Math.PI * 0.5;
 
@@ -689,24 +679,18 @@ function onResults(res){
       if(chargeLevel >= 1){
         pinching = false; cring.classList.remove('on'); chargeLevel = 0;
         triggerExplode();
-        setG('Explosion!', 'Full charge released!');
+        setG('Explosion!', 'Releasing charge…');
       } else {
-        setG('Charging…', Math.round(chargeLevel * 100) + '% — keep pinching to explode');
+        setG('Charging…', Math.round(chargeLevel * 100) + '% — hold pinch to charge');
       }
 
     } else if(!pinchNow && pinching){
       const cl = chargeLevel;
       pinching = false; cring.classList.remove('on'); chargeLevel = 0;
-      carc.style.strokeDashoffset = '502.65';
-      if(cl > 0.25){
-        triggerExplode();
-        setG('Explosion!', 'Releasing charge…');
-      } else {
-        const GNAMES = ['Fist','Point','Peace','Three','Four','Open Hand'];
-        setG(GNAMES[fc] || '', 'Pinch thumb & index to charge');
-      }
+      if(cl > 0.22){ triggerExplode(); setG('Explosion!', 'Releasing charge…'); }
+      else { setG(['Fist','Point','Peace','Three','Four','Open Hand'][fc] || '', 'Pinch to charge'); }
 
-    } else if(!pinchNow && !exploding && !reforming){
+    } else if(!pinchNow){
       const GNAMES = ['Fist','Point','Peace','Three','Four','Open Hand'];
       setG(GNAMES[fc] || 'Hand', fc + ' finger' + (fc !== 1 ? 's' : '') + ' · pinch to charge');
     }
@@ -714,68 +698,37 @@ function onResults(res){
 }
 
 /* ═══════════════════════════════════════
-   MOUSE, TOUCH & KEYBOARD CONTROLS (SEAMLESS FALLBACK)
+   OPTIONAL MOUSE & KEYBOARD FALLBACK (NON-INTRUSIVE)
 ═══════════════════════════════════════ */
-let isPointerDown = false;
-let pointerStartX = 0, pointerStartY = 0;
-let pointerChargeStart = 0;
-let pointerCharging = false;
+let isMouseDown = false;
+let mouseStartX = 0, mouseStartY = 0;
 
-window.addEventListener('pointerdown', (e) => {
-  if (e.target.closest('#camBtn') || e.target.closest('.pip') || e.target.closest('#brandBtn')) return;
-  lastInteractionTime = performance.now();
-  isPointerDown = true;
-  pointerStartX = e.clientX;
-  pointerStartY = e.clientY;
-
-  if (!handOn && !exploding && !reforming) {
-    pointerCharging = true;
-    pointerChargeStart = performance.now();
-    cring.classList.add('on');
-    carc.style.strokeDashoffset = '502.65';
-    setG('Charging…', 'Hold click to supercharge explosion');
-  }
+glCanvas.addEventListener('mousedown', (e) => {
+  if (handOn) return;
+  isMouseDown = true;
+  mouseStartX = e.clientX;
+  mouseStartY = e.clientY;
 });
 
-window.addEventListener('pointermove', (e) => {
-  if (!isPointerDown) return;
-  lastInteractionTime = performance.now();
-  const dx = (e.clientX - pointerStartX) / window.innerWidth;
-  const dy = (e.clientY - pointerStartY) / window.innerHeight;
-
-  if (!handOn) {
-    tgtAY += dx * Math.PI * 1.5;
-    tgtAX += dy * Math.PI * 1.2;
-    tgtWX += dx * 320;
-    tgtWY -= dy * 320;
-    pointerStartX = e.clientX;
-    pointerStartY = e.clientY;
-  }
+window.addEventListener('mousemove', (e) => {
+  if (!isMouseDown || handOn) return;
+  const dx = (e.clientX - mouseStartX) / window.innerWidth;
+  const dy = (e.clientY - mouseStartY) / window.innerHeight;
+  tgtAY += dx * Math.PI * 1.5;
+  tgtAX += dy * Math.PI * 1.2;
+  tgtWX += dx * 300;
+  tgtWY -= dy * 300;
+  mouseStartX = e.clientX;
+  mouseStartY = e.clientY;
 });
 
-window.addEventListener('pointerup', () => {
-  if (!isPointerDown) return;
-  isPointerDown = false;
-  lastInteractionTime = performance.now();
-
-  if (pointerCharging) {
-    pointerCharging = false;
-    cring.classList.remove('on');
-    const chargeDuration = performance.now() - pointerChargeStart;
-    carc.style.strokeDashoffset = '502.65';
-
-    if (chargeDuration > 380 && !exploding && !reforming) {
-      triggerExplode();
-      setG('Explosion!', 'Click charge released');
-    } else {
-      if (!handOn) setG('Mouse Ready', 'Drag to rotate · Hold click to charge · Scroll to scale');
-    }
-  }
+window.addEventListener('mouseup', () => {
+  isMouseDown = false;
 });
 
 window.addEventListener('wheel', (e) => {
-  lastInteractionTime = performance.now();
-  tgtR = Math.max(MIN_R, Math.min(MAX_R, tgtR - Math.sign(e.deltaY) * 25));
+  if (handOn) return;
+  tgtR = Math.max(MIN_R, Math.min(MAX_R, tgtR - Math.sign(e.deltaY) * 20));
   const pct = (tgtR - MIN_R) / (MAX_R - MIN_R);
   smfi.style.width = (pct * 100).toFixed(1) + '%';
   smth.style.left  = (pct * 100).toFixed(1) + '%';
@@ -783,34 +736,26 @@ window.addEventListener('wheel', (e) => {
   clearTimeout(window._smeterTimeout);
   window._smeterTimeout = setTimeout(() => {
     if (!twoHands) smeter.classList.remove('on');
-  }, 1500);
+  }, 1200);
 }, { passive: true });
 
 window.addEventListener('keydown', (e) => {
-  lastInteractionTime = performance.now();
   if (e.key >= '0' && e.key <= '5') {
     updateFC(parseInt(e.key, 10));
-    setG(`Palette ${e.key}`, 'Switched color theme');
   } else if (e.code === 'Space') {
     e.preventDefault();
     triggerExplode();
-    setG('Explosion!', 'Triggered via Spacebar');
   }
 });
 
 /* ═══════════════════════════════════════
    WEBCAM BUTTON
 ═══════════════════════════════════════ */
-camBtn.addEventListener('click', async function(){
-  lastInteractionTime = performance.now();
-  if(!cameraActive){
-    await setupCameraAndTracking();
-    return;
-  }
+document.getElementById('camBtn').addEventListener('click', function(){
   webcamBG = !webcamBG;
   webcam.classList.toggle('dimmed', !webcamBG);
   this.classList.toggle('on', webcamBG);
-  this.querySelector('span').textContent = webcamBG ? 'Webcam Active' : 'Webcam Dim';
+  this.querySelector('span').textContent = webcamBG ? 'Webcam On' : 'Webcam Dim';
 });
 
 /* ═══════════════════════════════════════
@@ -830,37 +775,12 @@ function render(now){
   lastT    = now;
   appTime += dt;
 
-  /* Idle auto-rotation when no hands or mouse drag */
-  if(!handOn && !isPointerDown){
-    autoAY += dt * 0.22;
+  /* Idle auto-rotation when no hands */
+  if(!handOn && !isMouseDown){
+    autoAY += dt * 0.20;
     tgtAX   = Math.sin(appTime * 0.32) * 0.18;
     tgtAY   = autoAY;
-    tgtWX   = lerp(tgtWX, 0, 0.02);
-    tgtWY   = lerp(tgtWY, 0, 0.02);
-
-    // Subtle demonstration explosion every 18 seconds if completely unattended
-    const idleTime = now - lastInteractionTime;
-    if(!exploding && !reforming && appTime > 4.0 && idleTime > 16000){
-      if(now - lastIdleExplode > 16000){
-        lastIdleExplode = now;
-        triggerExplode();
-      }
-    }
-  }
-
-  /* Handle pointer charging progression */
-  if(pointerCharging && !handOn && !exploding && !reforming){
-    const elapsed = now - pointerChargeStart;
-    const progVal = Math.min(1, elapsed / CHARGE_MS);
-    carc.style.strokeDashoffset = (502.65 * (1 - progVal)).toFixed(2);
-    setG('Charging…', Math.round(progVal * 100) + '% — hold click to explode');
-    if(progVal >= 1){
-      pointerCharging = false;
-      cring.classList.remove('on');
-      carc.style.strokeDashoffset = '502.65';
-      triggerExplode();
-      setG('Explosion!', 'Full charge exploded!');
-    }
+    tgtWX   = 0; tgtWY = 0;
   }
 
   /* Smooth-lerp all state */
@@ -869,9 +789,9 @@ function render(now){
   sphR   = lerp(sphR,   tgtR,   0.07);
   angX   = lerp(angX,   tgtAX,  0.055);
   angY   = lerp(angY,   tgtAY,  0.055);
-  curCol[0] = lerp(curCol[0], tgtCol[0], 0.06);
-  curCol[1] = lerp(curCol[1], tgtCol[1], 0.06);
-  curCol[2] = lerp(curCol[2], tgtCol[2], 0.06);
+  curCol[0] = lerp(curCol[0], tgtCol[0], 0.05);
+  curCol[1] = lerp(curCol[1], tgtCol[1], 0.05);
+  curCol[2] = lerp(curCol[2], tgtCol[2], 0.05);
 
   const c2 = [
     lerp(tgtCol[2], tgtCol[0], 0.45),
@@ -883,23 +803,17 @@ function render(now){
   let eT = 0, rT = 0;
   if(exploding){
     eT = Math.min(1, (now - explodeStart) / EXPLODE_MS);
-    if(eT >= 1){
-      exploding = false;
-      reforming = true;
-      reformStart = now;
-    }
+    if(eT >= 1){ exploding = false; reforming = true; reformStart = now; }
   } else if(reforming){
     rT = Math.min(1, (now - reformStart) / REFORM_MS);
     if(rT >= 1){
       reforming = false;
       setG('Reformed', 'Sphere restored');
-      setTimeout(() => {
-        if(!handOn && !isPointerDown) setG('—', 'Show hand or drag with mouse');
-      }, 2000);
+      setTimeout(() => { if(!handOn) setG('—', 'Show your hand to begin'); }, 2200);
     }
   }
 
-  /* MVP Matrix */
+  /* MVP matrix */
   const W   = glCanvas.width, H = glCanvas.height;
   const asp = W / H;
 
@@ -936,96 +850,52 @@ function render(now){
 }
 
 /* ═══════════════════════════════════════
-   INIT & CAMERA / MEDIAPIPE INITIALIZATION
+   INIT
 ═══════════════════════════════════════ */
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-let hands = null;
-let mediaStream = null;
-let trackingLoopActive = false;
-
-async function setupCameraAndTracking(){
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    console.warn('getUserMedia not supported or unsecure context.');
-    setSt('ok', 'Mouse Mode');
-    camBtn.classList.remove('on');
-    camBtn.querySelector('span').textContent = 'No Camera';
-    return;
-  }
-
-  try {
-    setSt('', 'Requesting Cam…');
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480, facingMode: 'user' }
-    });
-    webcam.srcObject = mediaStream;
-    await webcam.play();
-    cameraActive = true;
-    camBtn.classList.add('on');
-    camBtn.querySelector('span').textContent = 'Webcam Active';
-    setSt('ok', 'Camera Ready');
-
-    if(!hands && window.Hands){
-      hands = new Hands({
-        locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-      });
-      hands.setOptions({
-        maxNumHands:            2,
-        modelComplexity:        1,
-        minDetectionConfidence: 0.70,
-        minTrackingConfidence:  0.60,
-      });
-      hands.onResults(onResults);
-    }
-
-    if(!trackingLoopActive && hands){
-      trackingLoopActive = true;
-      let sending = false;
-      const processTracking = async () => {
-        if(!cameraActive) {
-          trackingLoopActive = false;
-          return;
-        }
-        if(!sending && webcam.readyState >= 2 && hands){
-          sending = true;
-          try {
-            await hands.send({ image: webcam });
-          } catch(err){
-            console.warn('Tracking frame error:', err);
-          }
-          sending = false;
-        }
-        requestAnimationFrame(processTracking);
-      };
-      requestAnimationFrame(processTracking);
-      setSt('ok', 'Ready');
-    }
-
-  } catch(err){
-    console.warn('Camera initialization error:', err);
-    cameraActive = false;
-    camBtn.classList.remove('on');
-    camBtn.querySelector('span').textContent = 'Cam Disabled';
-    setSt('ok', 'Mouse Mode');
-    setG('Mouse Mode', 'Drag with mouse · Hold to explode · Scroll to scale');
-  }
-}
 
 async function init(){
   lastT = performance.now();
 
-  // Intro: particle reform
-  reforming   = true;
-  reformStart = performance.now() - 200;
+  reforming    = true;
+  reformStart  = performance.now() - 200;
+
   requestAnimationFrame(render);
 
-  await wait(450);
+  await wait(400);
   loadEl.classList.add('gone');
   guide.classList.add('on');
-  setTimeout(() => { guide.classList.remove('on'); }, 8500);
+  setTimeout(() => {
+    guide.classList.remove('on');
+  }, 8000);
 
-  // Initialize camera and hand tracking in background
-  setupCameraAndTracking();
+  // Load MediaPipe and Camera
+  try{
+    const hands = new Hands({
+      locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+    });
+    hands.setOptions({
+      maxNumHands:            2,
+      modelComplexity:        1,
+      minDetectionConfidence: 0.72,
+      minTrackingConfidence:  0.65,
+    });
+    hands.onResults(onResults);
+
+    const cam = new Camera(webcam, {
+      onFrame: async () => {
+        await hands.send({ image: webcam });
+      },
+      width: 640,
+      height: 480
+    });
+    await cam.start();
+    setSt('ok', 'Ready');
+
+  } catch(e){
+    console.error('MediaPipe failed:', e);
+    setSt('', 'No camera');
+  }
 }
 
 init().catch(e => {
